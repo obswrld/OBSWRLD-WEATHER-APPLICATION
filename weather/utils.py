@@ -59,4 +59,3 @@ def get_weather_by_coordinates(lat, lon):
         return response.json()
     except requests.exceptions.RequestException as e:
         raise None
-    
