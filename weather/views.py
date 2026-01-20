@@ -1,7 +1,7 @@
 from django.http import JsonResponse
 from django.shortcuts import render
 from weather.models import SavedLocation
-from weather.utils import get_weather_data, get_forecast_data
+from weather.utils import get_weather_data, get_forecast_data, get_weather_by_coordinates
 
 
 def index(request):
@@ -50,4 +50,20 @@ def get_weather(request):
                 'description': item.get('weather', [{}])[0].get('description'),
                 'icon': item.get('weather', [{}])[0].get('icon'),
             })
+    return JsonResponse(response_data)
+
+def get_coords(request):
+    lat = request.GET.get('lat')
+    lon = request.GET.get('lon')
+    if not lat or not lon:
+        return JsonResponse({'error': 'latitude and longitude required'}, status=400)
+    weather_data = get_weather_by_coordinates(lat, lon)
+    if not weather_data:
+        return JsonResponse({'error': 'Unable to fetch weather data'}, status=400)
+    response_data = {
+        'current': {
+            'city': weather_data.get('name'),
+            'country': weather_data.get('sys', {}).get('country'),
+        }
+    }
     return JsonResponse(response_data)
