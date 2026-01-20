@@ -2,7 +2,7 @@ import requests
 from django.conf import settings
 from django.core.cache import cache
 
-def get_weather_app(city):
+def get_weather_data(city):
     cache_key = f'weather_{city}'
     cached_data = cache.get(cache_key)
     if cached_data:

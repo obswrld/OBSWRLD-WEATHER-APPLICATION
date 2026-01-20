@@ -15,4 +15,3 @@ class SavedLocation(models.Model):
 
     def __str__(self):
         return f'{self.city_name} ({self.country_code})'
-    
