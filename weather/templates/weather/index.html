@@ -27,6 +27,76 @@
             </div>
             <div class="error-message" id="searchError"></div>
         </section>
+
+        <section class="weather-display" id="weatherDisplay" style="display: none;">
+            <div class="current-weather">
+                <div class="location-info">
+                    <h2 class="city-name" id="cityName">--</h2>
+                    <p class="country" id="country">--</p>
+                </div>
+
+                <div class="temperature-info">
+                    <div class="temp-main">
+                        <span class="temperature" id="temperature">--</span>
+                        <span class="unit" id="tempUnit">°C</span>
+                    </div>
+                    <p class="weather-description" id="description">--</p>
+                    <div class="weather-icon-container">
+                        <img src="" alt="Weather icon" id="weatherIcon" class="weather-icon">
+                    </div>
+                </div>
+
+                <div class="weather-details">
+                    <div class="detail-item">
+                        <span class="detail-label">Feels Like</span>
+                        <span class="detail-value" id="feelsLike">--°</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Humidity</span>
+                        <span class="detail-value" id="humidity">--%</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Wind Speed</span>
+                        <span class="detail-value" id="windSpeed">-- km/h</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Pressure</span>
+                        <span class="detail-value" id="pressure">-- hPa</span>
+                    </div>
+                </div>
+
+                <button class="btn btn-save" id="saveLocationBtn">Save Location</button>
+            </div>
+
+            <div class="forecast-section">
+                <h3 class="forecast-title">24-Hour Forecast</h3>
+                <div class="forecast-container" id="forecastContainer">
+                    <!-- Forecast items will be inserted here by JavaScript -->
+                </div>
+            </div>
+        </section>
+
+        <section class="saved-locations" id="savedLocations">
+            <h3 class="section-title">Saved Locations</h3>
+            <div class="locations-grid" id="locationsGrid">
+                {% if saved_locations %}
+                    {% for location in saved_locations %}
+                    <div class="location-card" data-city="{{ location.city_name }}">
+                        <span class="location-name">{{ location.city_name }}, {{ location.country_code }}</span>
+                        <button class="btn-delete" data-id="{{ location.id }}">🗑️</button>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <p class="no-locations">No saved locations yet. Search for a city and save it!</p>
+                {% endif %}
+            </div>
+        </section>
+
+        <div class="loading-spinner" id="loadingSpinner" style="display: none;">
+            <div class="spinner"></div>
+            <p>Loading weather data...</p>
+        </div>
     </div>
+    <script src="{% static 'js/script.js' %}"></script>
 </body>
 </html>

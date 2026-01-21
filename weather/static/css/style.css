@@ -1,0 +1,56 @@
+*{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body{
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    color: white;
+    min-height: 100vh;
+    transition: background 0.5s ease;
+}
+
+body.clear{
+    background: linear-gradient(135deg, #667eea, 0%, #764ba2 100%);
+}
+
+body.clouds {
+    background: linear-gradient(135deg, #bdc3c7 0%, #2c3e50 100%);
+}
+body.rain {
+    background: linear-gradient(135deg, #373b44 0%, #4286f4 100%);
+}
+body.drizzle {
+    background: linear-gradient(135deg, #89f7fe 0%, #66a6ff 100%);
+}
+body.thunderstorm {
+    background: linear-gradient(135deg, #232526 0%, #414345 100%);
+}
+body.snow {
+    background: linear-gradient(135deg, #e6dada 0%, #274046 100%);
+}
+body.mist, body.fog, body.haze {
+    background: linear-gradient(135deg, #606c88 0%, #3f4c6b 100%);
+}
+body {
+    background: linear-gradient(135deg, #3a7017 0%, #42d79e 100%);
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+    animation: fadeIn 0.6s ease-in;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
