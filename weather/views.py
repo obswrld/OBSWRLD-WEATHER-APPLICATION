@@ -66,6 +66,18 @@ def get_coords(request):
         'current': {
             'city': weather_data.get('name'),
             'country': weather_data.get('sys', {}).get('country'),
+            'temperature': weather_data.get('main', {}).get('temp'),
+            'feels_like': weather_data.get('main', {}).get('feels_like'),
+            'humidity': weather_data.get('main', {}).get('humidity'),
+            'pressure': weather_data.get('main', {}).get('pressure'),
+            'wind_speed': weather_data.get('wind', {}).get('speed'),
+            'description': weather_data.get('weather', [{}])[0].get('description'),
+            'icon': weather_data.get('weather', [{}])[0].get('icon'),
+            'main': weather_data.get('weather', [{}])[0].get('main'),
+            'coordinates': {
+                'lat': weather_data.get('coord', {}).get('lat'),
+                'lon': weather_data.get('coord', {}).get('lon'),
+            }
         }
     }
     return JsonResponse(response_data)
