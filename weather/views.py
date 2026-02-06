@@ -2,28 +2,35 @@ from django.http import JsonResponse
 from django.shortcuts import render
 from django.views.decorators.http import require_http_methods
 import json
-from weather.models import SavedLocation
-from weather.utils import get_weather_data, get_forecast_data, get_weather_by_coordinates
+from .models import SavedLocation
+from .utils import get_weather_data, get_forecast_data, get_weather_by_coordinates
 
 
 def index(request):
-    saved_location = []
+    saved_locations = []  # FIXED: was 'saved_location'
     if request.user.is_authenticated:
-        saved_location = SavedLocation.objects.filter(user=request.user)
+        saved_locations = SavedLocation.objects.filter(user=request.user)
+
     context = {
-        'saved_location': saved_location,
+        'saved_locations': saved_locations,  # FIXED: match the HTML template variable
     }
     return render(request, 'weather/index.html', context)
+
 
 def get_weather(request):
     city = request.GET.get('city', '')
     unit = request.GET.get('unit', 'metric')
+
     if not city:
-        return JsonResponse({'error': 'city parameter required'}, status=400)
+        return JsonResponse({'error': 'City parameter required'}, status=400)
+
     weather_data = get_weather_data(city)
+
     if not weather_data:
-        return JsonResponse({'error': 'City not found or API error'}, status=400)
-    forecast = get_forecast_data(city)
+        return JsonResponse({'error': 'City not found or API error'}, status=404)
+
+    forecast_data = get_forecast_data(city)
+
     response_data = {
         'current': {
             'city': weather_data.get('name'),
@@ -43,8 +50,9 @@ def get_weather(request):
         },
         'forecast': []
     }
-    if forecast:
-        forecast_list = forecast.get('list', [])[:8]
+
+    if forecast_data:
+        forecast_list = forecast_data.get('list', [])[:8]
         for item in forecast_list:
             response_data['forecast'].append({
                 'time': item.get('dt_txt'),
@@ -52,16 +60,22 @@ def get_weather(request):
                 'description': item.get('weather', [{}])[0].get('description'),
                 'icon': item.get('weather', [{}])[0].get('icon'),
             })
+
     return JsonResponse(response_data)
 
-def get_coords(request):
+
+def get_weather_by_coords(request):  # FIXED: renamed from get_coords
     lat = request.GET.get('lat')
     lon = request.GET.get('lon')
+
     if not lat or not lon:
-        return JsonResponse({'error': 'latitude and longitude required'}, status=400)
+        return JsonResponse({'error': 'Latitude and longitude required'}, status=400)
+
     weather_data = get_weather_by_coordinates(lat, lon)
+
     if not weather_data:
-        return JsonResponse({'error': 'Unable to fetch weather data'}, status=400)
+        return JsonResponse({'error': 'Unable to fetch weather data'}, status=404)
+
     response_data = {
         'current': {
             'city': weather_data.get('name'),
@@ -80,20 +94,25 @@ def get_coords(request):
             }
         }
     }
+
     return JsonResponse(response_data)
+
 
 @require_http_methods(["POST"])
 def save_location(request):
     if not request.user.is_authenticated:
-        return JsonResponse({'error': 'Authentication Required'}, status=401)
+        return JsonResponse({'error': 'Authentication required'}, status=401)
+
     try:
         data = json.loads(request.body)
         city_name = data.get('city_name')
-        country_code = data.get('country_code')
+        country_code = data.get('country_code', '')
         latitude = data.get('latitude')
         longitude = data.get('longitude')
+
         if not city_name:
             return JsonResponse({'error': 'City name required'}, status=400)
+
         location, created = SavedLocation.objects.get_or_create(
             user=request.user,
             city_name=city_name,
@@ -103,24 +122,27 @@ def save_location(request):
                 'longitude': longitude,
             }
         )
+
         return JsonResponse({
             'success': True,
-            'message':'Location Saved' if created else 'Location already saved'
+            'message': 'Location saved' if created else 'Location already saved'
         })
+
     except json.JSONDecodeError:
-        return JsonResponse({'error': 'Invalid JSON data'}, status=400)
+        return JsonResponse({'error': 'Invalid JSON'}, status=400)
 
 
 @require_http_methods(["DELETE"])
-def delete_location(request):
+def delete_location(request, location_id):  # FIXED: added location_id parameter
     if not request.user.is_authenticated:
-        return JsonResponse({'error': 'Authentication Required'}, status=401)
+        return JsonResponse({'error': 'Authentication required'}, status=401)
+
     try:
-        location = SavedLocation.objects.get(id=id, user=request.user)
+        location = SavedLocation.objects.get(id=location_id, user=request.user)  # FIXED: use location_id
         location.delete()
         return JsonResponse({
             'success': True,
-            'message': 'Location Deleted'
+            'message': 'Location deleted'
         })
     except SavedLocation.DoesNotExist:
         return JsonResponse({'error': 'Location not found'}, status=404)

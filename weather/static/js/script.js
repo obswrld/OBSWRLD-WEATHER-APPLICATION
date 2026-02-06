@@ -164,6 +164,7 @@ function displayWeatherData(data) {
     }
 
     weatherDisplay.style.display = 'block';
+
 }
 
 function displayForecast(forecast) {
